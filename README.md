@@ -1,5 +1,5 @@
-# This is a website code
-
-Django project
+# Django project
 
 **only for study**
+
+This is a django demo.
