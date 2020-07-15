@@ -1,19 +1,11 @@
 from django.shortcuts import render
 from django.shortcuts import HttpResponse,HttpResponseRedirect,Http404,get_object_or_404
 from django.urls import reverse
+from django.views import generic
 # Create your views here.
 
-from myapp import models  # 导入models文件
-from .models import Question
+from .models import Question,Choice # 从models导入
 #user_list = []
-
-def index(request):
-    latest_question_list = Question.objects.order_by('-pub_date')[:5]
-
-    context = {
-        'latest_question_list': latest_question_list,
-    }
-    return render(request, 'myapp/index.html', context)
 
 '''
 def index(request):
@@ -29,14 +21,23 @@ def index(request):
     return render(request,'index.html',{'data':user_list})
 '''
 
-def detail(request, question_id):
-    question = get_object_or_404(Question,pk=question_id)
-    #return HttpResponse("You're looking at question %s." % question)
-    return render(request,'myapp/detail.html',{'question':question})
+class IndexView(generic.ListView):
+    template_name = 'myapp/index.html'
+    context_object_name = 'latest_question_list'
 
-def results(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, 'myapp/results.html', {'question': question})
+    def get_queryset(self):
+        """Return the last five published questions."""
+        return Question.objects.order_by('-pub_date')[:5]
+
+
+class DetailView(generic.DetailView):
+    model = Question
+    template_name = 'myapp/detail.html'
+
+
+class ResultsView(generic.DetailView):
+    model = Question
+    template_name = 'myapp/results.html'
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
